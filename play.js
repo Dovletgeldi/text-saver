@@ -3,6 +3,14 @@ const titleText = document.getElementById("msg-input-title")
 const contentText = document.getElementById("msg-input")
 const savedList = document.getElementById("saved-list")
 
+document.addEventListener("DOMContentLoaded", () => {
+  const savedData = JSON.parse(localStorage.getItem("savedItems")) || [];
+
+  savedData.forEach(item => {
+    createListItem(item.title, item.paragraph);
+  });
+});
+
 saveBtn.addEventListener("click", () => {
   const title = titleText.value.trim()
   const paragraph = contentText.value.trim()
