@@ -2,6 +2,7 @@ const saveBtn = document.getElementById("sv-msg-input");
 const titleText = document.getElementById("msg-input-title")
 const contentText = document.getElementById("msg-input")
 const savedList = document.getElementById("saved-list")
+const searchBar = document.getElementById("search-bar")
 
 document.addEventListener("DOMContentLoaded", () => {
   const savedData = JSON.parse(localStorage.getItem("savedItems")) || [];
@@ -10,6 +11,20 @@ document.addEventListener("DOMContentLoaded", () => {
     createListItem(item.title, item.paragraph);
   });
 });
+
+searchBar.addEventListener("input", (e) => {
+  const query = e.target.value.toLowerCase()
+  const items = document.querySelectorAll(".saved-item")
+  
+  items.forEach(item => {
+    const title = item.textContent.toLocaleLowerCase()
+    if(title.includes(query)) {
+      item.style.display = ""
+    } else {
+      item.style.display = "none"
+    }
+  })
+})
 
 saveBtn.addEventListener("click", () => {
   const title = titleText.value.trim()
@@ -31,22 +46,49 @@ saveBtn.addEventListener("click", () => {
 })
 
 function createListItem(title, paragraph) {
-  const item = document.createElement("div")
-  item.classList.add("saved-item")
-  item.textContent = title
-  item.setAttribute("data-paragraph", paragraph)
-  
+  const item = document.createElement("div");
+  item.classList.add("saved-item");
+  item.setAttribute("data-paragraph", paragraph);
+
+  const titleSpan = document.createElement("span");
+  titleSpan.classList.add("title");
+  titleSpan.textContent = title;
+
   item.addEventListener("click", () => {
     navigator.clipboard.writeText(paragraph).then(() => {
-      alert(`Paragraph copied: ${paragraph}`)
+      console.log("Paragraph copied!");
     }).catch(err => {
-      console.error("Failed to copy", err)
-    })
-  })
+      console.error("Failed to copy", err);
+    });
+  });
 
-  savedList.appendChild(item)
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.classList.add("delete-btn");
 
+  deleteBtn.addEventListener("dblclick", () => {
+    savedList.removeChild(item);
+    let savedData = JSON.parse(localStorage.getItem("savedItems")) || [];
+    savedData = savedData.filter(
+      savedItem => savedItem.title !== title || savedItem.paragraph !== paragraph
+    );
+    localStorage.setItem("savedItems", JSON.stringify(savedData));
+  });
+
+  item.appendChild(titleSpan);
+  item.appendChild(deleteBtn);
+
+  savedList.appendChild(item);
 }
+
+document.getElementById("create").addEventListener("click", () => {
+  const container = document.querySelector(".container");
+  container.classList.toggle("hidden");
+});
+
+
+
+
 
 
 
